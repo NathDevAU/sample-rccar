@@ -12,7 +12,8 @@
 #pragma comment(lib, "Hid")
 #pragma comment(lib, "setupapi")
 
-Controller::Controller(){
+Controller::Controller()
+{
 	//init required variables
 	_controllerHandle = nullptr;
 	_pCaps = nullptr;
@@ -24,21 +25,27 @@ Controller::Controller(){
 	_succ = 0;
 }
 
-Controller::~Controller(){
+Controller::~Controller()
+{
 
-	if (_pPreparsedData != 0){
+	if (_pPreparsedData != 0)
+	{
 		HidD_FreePreparsedData(_pPreparsedData);
 	}
-	if (_pCaps != nullptr){
+	if (_pCaps != nullptr)
+	{
 		free(_pCaps);
 	}
-	if (_pButtonCaps != nullptr){
+	if (_pButtonCaps != nullptr)
+	{
 		free(_pButtonCaps);
 	}
-	if (_pButtonUsages != nullptr){
+	if (_pButtonUsages != nullptr)
+	{
 		free(_pButtonUsages);
 	}
-	if (_pInputReport != nullptr){
+	if (_pInputReport != nullptr)
+	{
 		free(_pInputReport);
 	}
 
@@ -46,7 +53,8 @@ Controller::~Controller(){
 }
 
 
-bool Controller::registerController(int pDeviceId){
+bool Controller::registerController(int pDeviceId)
+{
 	
 	//Required variables to iterate over the device interface
 	DWORD result = 0;
@@ -68,25 +76,30 @@ bool Controller::registerController(int pDeviceId){
 	deviceInterfaceData->cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
 
 	//iterate through devices
-	while (SetupDiEnumDeviceInterfaces(deviceset, nullptr, hidguid, deviceindex, deviceInterfaceData)){
+	while (SetupDiEnumDeviceInterfaces(deviceset, nullptr, hidguid, deviceindex, deviceInterfaceData))
+	{
 		//this should fail originally in order to get buffer size
-		if (deviceInterfaceInfo != nullptr){
+		if (deviceInterfaceInfo != nullptr)
+		{
 			free(deviceInterfaceInfo);
 		}
 		if (SetupDiGetDeviceInterfaceDetail(deviceset, deviceInterfaceData, nullptr, 0, (PDWORD)&buffersize, nullptr) ||
-			GetLastError() != ERROR_INSUFFICIENT_BUFFER){
+			GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+		{
 			goto SETUP_ERROR;
 		}
 		deviceInterfaceInfo = (PSP_DEVICE_INTERFACE_DETAIL_DATA)malloc(buffersize);
 		deviceInterfaceInfo->cbSize = sizeof(*deviceInterfaceInfo);
 		
 		//device info buffer allocated, get details
-		if (!SetupDiGetDeviceInterfaceDetail(deviceset, deviceInterfaceData, deviceInterfaceInfo, buffersize, (PDWORD)&buffersize, nullptr)){
+		if (!SetupDiGetDeviceInterfaceDetail(deviceset, deviceInterfaceData, deviceInterfaceInfo, buffersize, (PDWORD)&buffersize, nullptr))
+		{
 			goto SETUP_ERROR;
 		}
 		
 		//you must pass in the device id of the hid client to read from
-		if (deviceindex == pDeviceId){
+		if (deviceindex == pDeviceId)
+		{
 			_controllerHandle = CreateFile(
 				deviceInterfaceInfo->DevicePath,
 				GENERIC_READ | GENERIC_WRITE,
@@ -96,13 +109,15 @@ bool Controller::registerController(int pDeviceId){
 				FILE_ATTRIBUTE_NORMAL,
 				nullptr
 				);
-			if (_controllerHandle == INVALID_HANDLE_VALUE){
+			if (_controllerHandle == INVALID_HANDLE_VALUE)
+			{
 				goto HID_SETUP_FAILURE;
 			}
 			else{
 
 		    	//get preparsed data
-				if (HidD_GetPreparsedData(_controllerHandle, &_pPreparsedData) == FALSE){
+				if (HidD_GetPreparsedData(_controllerHandle, &_pPreparsedData) == FALSE)
+				{
 					goto HID_SETUP_FAILURE;
 				}
 
@@ -110,7 +125,8 @@ bool Controller::registerController(int pDeviceId){
 				_pCaps = (PHIDP_CAPS)(malloc(sizeof(HIDP_CAPS)));
 				_succ = HidP_GetCaps(_pPreparsedData, _pCaps);
 
-				if (_succ == HIDP_STATUS_INVALID_PREPARSED_DATA){
+				if (_succ == HIDP_STATUS_INVALID_PREPARSED_DATA)
+				{
 					goto HID_SETUP_FAILURE;
 				}
 
@@ -120,7 +136,8 @@ bool Controller::registerController(int pDeviceId){
 
 				_succ = HidP_GetButtonCaps(HidP_Input, _pButtonCaps, &numInputButtonCaps, _pPreparsedData);
 
-				if (_succ != HIDP_STATUS_SUCCESS){
+				if (_succ != HIDP_STATUS_SUCCESS)
+				{
 					goto HID_SETUP_FAILURE;
 				}
 
@@ -138,7 +155,8 @@ bool Controller::registerController(int pDeviceId){
 
 				_succ = HidP_GetValueCaps(HidP_Input, _pValueCaps, &numInputValueCaps, _pPreparsedData);
 
-				if (_succ != HIDP_STATUS_SUCCESS){
+				if (_succ != HIDP_STATUS_SUCCESS)
+				{
 					goto HID_SETUP_FAILURE;
 				}
 
@@ -146,19 +164,24 @@ bool Controller::registerController(int pDeviceId){
 
 
 			HID_SETUP_FAILURE:
-				if (_pPreparsedData != 0){
+				if (_pPreparsedData != 0)
+				{
 					HidD_FreePreparsedData(_pPreparsedData);
 				}
-				if (_pCaps != nullptr){
+				if (_pCaps != nullptr)
+				{
 					free(_pCaps);
 				}
-				if (_pButtonCaps != nullptr){
+				if (_pButtonCaps != nullptr)
+				{
 					free(_pButtonCaps);
 				}
-				if (_pButtonUsages != nullptr){
+				if (_pButtonUsages != nullptr)
+				{
 					free(_pButtonUsages);
 				}
-				if (_pInputReport != nullptr){
+				if (_pInputReport != nullptr)
+				{
 					free(_pInputReport);
 				}
 				return false;
@@ -176,19 +199,23 @@ SETUP_ERROR:
 	int err = GetLastError();
 	return false;
 SETUP_DONE:
-	if (deviceset != INVALID_HANDLE_VALUE && deviceset != nullptr){
+	if (deviceset != INVALID_HANDLE_VALUE && deviceset != nullptr)
+	{
 		SetupDiDestroyDeviceInfoList(deviceset);
 	}
 
-	if (hidguid != nullptr){
+	if (hidguid != nullptr)
+	{
 		free(hidguid);
 	}
 
-	if (deviceInterfaceData != nullptr){
+	if (deviceInterfaceData != nullptr)
+	{
 		free(deviceInterfaceData);
 	}
 
-	if (deviceInterfaceInfo != nullptr){
+	if (deviceInterfaceInfo != nullptr)
+	{
 		free(deviceInterfaceInfo);
 	}
 
@@ -203,7 +230,8 @@ SETUP_DONE:
 	Furthermore, you need to update nesmapping.h, or include a different mapping file, which holds constants for the button mapping.
 	(You'll have to figure out the button mapping experimentally using log statements or breakpoints)
  **/
-int Controller::getDPadInput(bool * pValues){
+int Controller::getDPadInput(bool * pValues)
+{
 	DWORD readbytecount = 0;
 	_succ = ReadFile(
 		_controllerHandle,
@@ -213,7 +241,8 @@ int Controller::getDPadInput(bool * pValues){
 		nullptr
 		);
 
-	if (!_succ){
+	if (!_succ)
+	{
 		goto DPAD_INPUT_FAILURE;
 	}
 
@@ -221,17 +250,21 @@ int Controller::getDPadInput(bool * pValues){
 	LONG value = 0;
 
 	//reset direction flags
-	for (int i = 0; i < NUM_DIRECTIONS; i++){
+	for (int i = 0; i < NUM_DIRECTIONS; i++)
+	{
 		pValues[i] = false;
 	}
 
-	for (int valIt = 0; valIt < _pCaps->NumberInputValueCaps; valIt++){
+	for (int valIt = 0; valIt < _pCaps->NumberInputValueCaps; valIt++)
+	{
 		HidP_GetUsageValue(HidP_Input, _pValueCaps[valIt].UsagePage, _pValueCaps[valIt].LinkCollection, _pValueCaps[valIt].Range.UsageMin, (PULONG)&value, _pPreparsedData,
 			_pInputReport, readbytecount
 			);
 
-		if (valIt == 0){
-			switch (value){
+		if (valIt == 0)
+		{
+			switch (value)
+			{
 			case DPAD_UP:
 				pValues[DPAD_UP_INDEX] = true;
 				break;
@@ -242,8 +275,10 @@ int Controller::getDPadInput(bool * pValues){
 				break;
 			}
 		}
-		else{
-			switch (value){
+		else
+		{
+			switch (value)
+			{
 			case DPAD_RIGHT:
 				pValues[DPAD_RIGHT_INDEX] = true;
 				break;
@@ -260,19 +295,24 @@ int Controller::getDPadInput(bool * pValues){
 	return _pCaps->NumberInputValueCaps;
 
 DPAD_INPUT_FAILURE:
-		if (_pPreparsedData != 0){
+		if (_pPreparsedData != 0)
+		{
 			HidD_FreePreparsedData(_pPreparsedData);
 		}
-		if (_pCaps != nullptr){
+		if (_pCaps != nullptr)
+		{
 			free(_pCaps);
 		}
-		if (_pButtonCaps != nullptr){
+		if (_pButtonCaps != nullptr)
+		{
 			free(_pButtonCaps);
 		}
-		if (_pButtonUsages != nullptr){
+		if (_pButtonUsages != nullptr)
+		{
 			free(_pButtonUsages);
 		}
-		if (_pInputReport != nullptr){
+		if (_pInputReport != nullptr)
+		{
 			free(_pInputReport);
 		}
 		return -1;
@@ -285,7 +325,8 @@ This will not be true for all HID Devices. If you want to use this function, you
 Furthermore, you need to update nesmapping.h, or include a different mapping file, which holds constants for the button mapping.
 (You'll have to figure out the button mapping experimentally using log statements or breakpoints)
 **/
-int Controller::getButtonInput(bool * pValues){
+int Controller::getButtonInput(bool * pValues)
+{
 	DWORD readbytecount = 0;
 	_succ = ReadFile(
 		_controllerHandle,
@@ -295,7 +336,8 @@ int Controller::getButtonInput(bool * pValues){
 		nullptr
 		);
 
-	if (!_succ){
+	if (!_succ)
+	{
 		goto DPAD_INPUT_FAILURE;
 	}
 
@@ -305,14 +347,17 @@ int Controller::getButtonInput(bool * pValues){
 	HidP_GetUsages(HidP_Input, _pButtonCaps[0].UsagePage, _pButtonCaps[0].LinkCollection, _pButtonUsages, &numButtonUsages, _pPreparsedData, _pInputReport, _pCaps->InputReportByteLength);
 	
 	//reset button values to 0
-	for (unsigned int i = 0; i < NUM_BUTTONS; i++){
+	for (unsigned int i = 0; i < NUM_BUTTONS; i++)
+	{
 		pValues[i] = false;
 	}
 
 	//every button that is currently pressed will have it's ID in the _pButtonUsages array
-	for (unsigned int i = 0; i < numButtonUsages; i++){
+	for (unsigned int i = 0; i < numButtonUsages; i++)
+	{
 		USAGE dat = _pButtonUsages[i];
-		switch (dat){
+		switch (dat)
+		{
 		case BUTTON_A:
 			pValues[BUTTON_A_INDEX] = true;
 				break;
@@ -334,19 +379,24 @@ int Controller::getButtonInput(bool * pValues){
 
 
 DPAD_INPUT_FAILURE:
-	if (_pPreparsedData != 0){
+	if (_pPreparsedData != 0)
+	{
 		HidD_FreePreparsedData(_pPreparsedData);
 	}
-	if (_pCaps != nullptr){
+	if (_pCaps != nullptr)
+	{
 		free(_pCaps);
 	}
-	if (_pButtonCaps != nullptr){
+	if (_pButtonCaps != nullptr)
+	{
 		free(_pButtonCaps);
 	}
-	if (_pButtonUsages != nullptr){
+	if (_pButtonUsages != nullptr)
+	{
 		free(_pButtonUsages);
 	}
-	if (_pInputReport != nullptr){
+	if (_pInputReport != nullptr)
+	{
 		free(_pInputReport);
 	}
 	return -1;

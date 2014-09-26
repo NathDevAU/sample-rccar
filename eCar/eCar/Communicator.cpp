@@ -8,11 +8,13 @@ SOCKET partner_socket;
 WSADATA wsdata;
 sockaddr_in server;
 
-Communicator::Communicator(){
+Communicator::Communicator()
+{
 
 }
 
-Communicator::~Communicator(){
+Communicator::~Communicator()
+{
 }
 
 /*
@@ -20,7 +22,8 @@ Communicator::~Communicator(){
 
 	Returns 1 for _success, 0 for failure
 */
-int Communicator::startWindowsConnection(){
+int Communicator::startWindowsConnection()
+{
 	WORD wVersionRequested = MAKEWORD(2, 2);
 	if (WSAStartup(wVersionRequested, &wsdata) != 0)
 	{
@@ -29,7 +32,8 @@ int Communicator::startWindowsConnection(){
 	return 1; //1 for _success
 }
 
-int Communicator::closeWindowsConnection(){
+int Communicator::closeWindowsConnection()
+{
 	closesocket(partner_socket);
 	return WSACleanup();
 }
@@ -39,9 +43,11 @@ Opens a UDP Socket
 
 -1 for failure, else returns the sd
 */
-int Communicator::openUDPSocket(){
+int Communicator::openUDPSocket()
+{
 	partner_socket = socket(AF_INET, SOCK_DGRAM, 0);
-	if (partner_socket == INVALID_SOCKET){
+	if (partner_socket == INVALID_SOCKET)
+	{
 		//cleanup windows connection and return 0
 		WSACleanup();
 
@@ -53,12 +59,14 @@ int Communicator::openUDPSocket(){
 /*
 Setup server details and bind
 */
-int Communicator::setupServerAndBind(){
+int Communicator::setupServerAndBind()
+{
 	hostent * host;
 
 	host = gethostbyname(host_name);
 
-	if (host == NULL){
+	if (host == NULL)
+	{
 		//failed hostname lookup
 		WSACleanup();
 		return 0;
@@ -72,7 +80,8 @@ int Communicator::setupServerAndBind(){
 	server.sin_addr.S_un.S_un_b.s_b3 = host->h_addr_list[0][2];
 	server.sin_addr.S_un.S_un_b.s_b4 = host->h_addr_list[0][3];
 	
-	if (bind(partner_socket, (struct sockaddr *)&server, sizeof(server))){
+	if (bind(partner_socket, (struct sockaddr *)&server, sizeof(server)))
+	{
 		int se;
 		se = WSAGetLastError();
 
@@ -88,17 +97,20 @@ int Communicator::setupServerAndBind(){
 /*
 Receives udp bytes and returns the command code
 */
-Command Communicator::receiveCommand(){
+Command Communicator::receiveCommand()
+{
 	
 	char * bytes = new char[1];
 	int bytecount = -1;
 	bytecount = recv(partner_socket, bytes, 1, 0);
 	
-	if (bytecount == -1){
+	if (bytecount == -1)
+	{
 		return STOP;
 	}
 	
-	switch (bytes[0]){
+	switch (bytes[0])
+	{
 	case '1' :
 		return FORWARD;
 		break;

@@ -4,7 +4,8 @@
 #include <windows.h>
 #include <Hidsdi.h>
 
-class Controller{
+class Controller
+{
 public:
 	//constructor for the controller object
 	Controller();

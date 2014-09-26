@@ -60,8 +60,10 @@ void setup()
 // the loop routine runs over and over again forever:
 void loop()
 {
-	if (useNetworkCommands){
-		switch (comm->receiveCommand()){
+	if (useNetworkCommands)
+	{
+		switch (comm->receiveCommand())
+		{
 		case FORWARD:
 			digitalWrite(OUT_UP, HIGH);
 			digitalWrite(OUT_DOWN, LOW);
@@ -99,7 +101,8 @@ void loop()
 			digitalWrite(OUT_DOWN, LOW);
 			digitalWrite(OUT_LEFT, LOW);
 		}
-	}else{
+	}else
+	{
 		controller->getDPadInput(dpadValues);
 		controller->getButtonInput(buttonValues);
 		if (dpadValues[DPAD_UP_INDEX]){

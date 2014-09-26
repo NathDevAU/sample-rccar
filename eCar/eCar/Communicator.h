@@ -6,8 +6,8 @@
 #define COMMUNICATOR_H
 
 #include "Command.h"
-class Communicator{
-
+class Communicator
+{
 	const unsigned short PORT_NUMBER = 10001;
 	const char * host_name = "HOSTNAME";
 public:
@@ -37,7 +37,6 @@ public:
 	Receives udp bytes and returns the command code
 	*/
 	Command receiveCommand();
-
 };
 
 
