@@ -10,22 +10,23 @@
 #include "nesmapping.h"
 
 
-const int OUT_UP = 10;
-const int OUT_RIGHT = 12;
-const int OUT_DOWN = 11;
-const int OUT_LEFT = 13;
+//output pin definitions
+#define OUT_UP 10
+#define OUT_RIGHT 12
+#define OUT_DOWN 11
+#define OUT_LEFT 13
 
-Controller * controller;
-bool * dpadValues;
-bool * buttonValues;
-bool useNetworkCommands;
+Controller * g_controller;
+bool * g_dpadValues;
+bool * g_buttonValues;
+bool g_useNetworkCommands;
 
 Communicator * comm;
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	useNetworkCommands = false;
+	g_useNetworkCommands = false;
     return RunArduinoSketch();
 }
 
@@ -43,11 +44,11 @@ void setup()
 	digitalWrite(OUT_DOWN, LOW);
 	digitalWrite(OUT_LEFT, LOW);
 
-	//setup controller
-	controller = new Controller();
-	controller->registerController(0);
-	dpadValues = (bool *)malloc(sizeof(int)* 4);
-	buttonValues = (bool *)malloc(sizeof(int)* 4);
+	//setup g_controller
+	g_controller = new Controller();
+	g_controller->registerController(0);
+	g_dpadValues = (bool *)malloc(sizeof(int)* 4);
+	g_buttonValues = (bool *)malloc(sizeof(int)* 4);
 
 	//setup network communications
 	comm = new Communicator();
@@ -60,7 +61,7 @@ void setup()
 // the loop routine runs over and over again forever:
 void loop()
 {
-	if (useNetworkCommands)
+	if (g_useNetworkCommands)
 	{
 		switch (comm->receiveCommand())
 		{
@@ -93,7 +94,7 @@ void loop()
 			digitalWrite(OUT_LEFT, LOW);
 			break;
 		case SWITCH_COMMAND_MODE:
-			useNetworkCommands = !useNetworkCommands;
+			g_useNetworkCommands = false;
 			break;
 		default:
 			digitalWrite(OUT_UP, LOW);
@@ -103,13 +104,13 @@ void loop()
 		}
 	}else
 	{
-		controller->getDPadInput(dpadValues);
-		controller->getButtonInput(buttonValues);
-		if (dpadValues[DPAD_UP_INDEX]){
+		g_controller->getDPadInput(g_dpadValues);
+		g_controller->getButtonInput(g_buttonValues);
+		if (g_dpadValues[DPAD_UP_INDEX]){
 			digitalWrite(OUT_DOWN, LOW);
 			digitalWrite(OUT_UP, HIGH);
 		}
-		else if (dpadValues[DPAD_DOWN_INDEX]){
+		else if (g_dpadValues[DPAD_DOWN_INDEX]){
 			digitalWrite(OUT_UP, LOW);
 			digitalWrite(OUT_DOWN, HIGH);
 		}
@@ -118,11 +119,11 @@ void loop()
 			digitalWrite(OUT_DOWN, LOW);
 		}
 
-		if (dpadValues[DPAD_LEFT_INDEX]){
+		if (g_dpadValues[DPAD_LEFT_INDEX]){
 			digitalWrite(OUT_RIGHT, LOW);
 			digitalWrite(OUT_LEFT, HIGH);	
 		}
-		else if (dpadValues[DPAD_RIGHT_INDEX]){
+		else if (g_dpadValues[DPAD_RIGHT_INDEX]){
 			digitalWrite(OUT_LEFT, LOW);
 			digitalWrite(OUT_RIGHT, HIGH);
 		}
@@ -131,8 +132,8 @@ void loop()
 			digitalWrite(OUT_RIGHT, LOW);
 		}
 
-		if (buttonValues[BUTTON_SELECT_INDEX]){
-			useNetworkCommands = true;
+		if (g_buttonValues[BUTTON_SELECT_INDEX]){
+			g_useNetworkCommands = true;
 		}
 	}
 	

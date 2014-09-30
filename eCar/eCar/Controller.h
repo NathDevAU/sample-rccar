@@ -4,6 +4,24 @@
 #include <windows.h>
 #include <Hidsdi.h>
 
+#define CHECK_NULL(ptr, label) \
+if (ptr == NULL) \
+{ \
+	goto label; \
+}\
+
+#define CHECK_HID(value, label)\
+if (value != HIDP_STATUS_SUCCESS)\
+{\
+	goto label; \
+}\
+
+#define CHECK_FAILURE(value, label)\
+if (!value)\
+{\
+	goto label; \
+}\
+
 class Controller
 {
 public:
@@ -21,6 +39,9 @@ public:
 	
 	//gets the button usages input, storing it as an array of 4 booleans (A, B, Start, Select)
 	int getButtonInput(bool * pValues);
+
+	//clears hid structures
+	void clearHidStructures();
 private:
 	//handle to the controller
 	HANDLE _controllerHandle;

@@ -20,7 +20,7 @@ Communicator::~Communicator()
 /*
 	Starts the required Windows conection
 
-	Returns 1 for _success, 0 for failure
+	Returns 1 for success, 0 for failure
 */
 int Communicator::startWindowsConnection()
 {
@@ -29,7 +29,7 @@ int Communicator::startWindowsConnection()
 	{
 		return 0;
 	}
-	return 1; //1 for _success
+	return 1; //1 for success
 }
 
 int Communicator::closeWindowsConnection()
@@ -58,6 +58,7 @@ int Communicator::openUDPSocket()
 
 /*
 Setup server details and bind
+Returns 1 if success, error code if failure
 */
 int Communicator::setupServerAndBind()
 {
@@ -87,7 +88,7 @@ int Communicator::setupServerAndBind()
 
 		WSACleanup();
 		closesocket(partner_socket);
-		return 0;
+		return se;
 	}
 	
 	
