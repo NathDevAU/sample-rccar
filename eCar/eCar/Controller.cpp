@@ -31,34 +31,7 @@ Controller::Controller()
 
 Controller::~Controller()
 {
-
-	if (_pPreparsedData != 0)
-	{
-		HidD_FreePreparsedData(_pPreparsedData);
-		_pPreparsedData = 0;
-	}
-	if (_pCaps != nullptr)
-	{
-		free(_pCaps);
-		_pCaps = 0;
-	}
-	if (_pButtonCaps != nullptr)
-	{
-		free(_pButtonCaps);
-		_pButtonCaps = 0;
-	}
-	if (_pButtonUsages != nullptr)
-	{
-		free(_pButtonUsages);
-		_pButtonUsages = 0;
-	}
-	if (_pInputReport != nullptr)
-	{
-		free(_pInputReport);
-		_pInputReport = 0;
-	}
-
-
+	clearHidStructures();
 }
 
 
