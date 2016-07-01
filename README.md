@@ -114,3 +114,7 @@ With Windows on Devices, it's easy to send simple communications over a network 
 See **_Communicator.h_** and **_Communicator.cpp_** to see how we've used winsock & UDP.
 
 You can also read the documentation on MSDN for more information, available [here](TODO)
+
+===
+
+This project has adopted the [Microsoft Open Source Code of Conduct](http://microsoft.github.io/codeofconduct). For more information see the [Code of Conduct FAQ](http://microsoft.github.io/codeofconduct/faq.md) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments. 
